@@ -1,0 +1,71 @@
+.navbar {
+  background-color: #2c3e50;
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1rem; /* made logo a bit smaller */
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: color 0.3s;
+  font-size: 0.92rem; /* smaller text for nav links */
+}
+
+.nav-links a:hover {
+  color: #3498db;
+}
+
+.nav-links a.active {
+  color: #3498db;
+  border-bottom: 2px solid #3498db;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.92rem; /* smaller text in user section */
+}
+
+.username {
+  font-size: 0.86rem;
+  opacity: 0.8;
+}
+
+button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-size: 0.92rem; /* smaller text for buttons */
+}
+
+button:hover {
+  background: #2980b9;
+}

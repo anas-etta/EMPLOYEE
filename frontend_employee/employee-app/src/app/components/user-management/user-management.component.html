@@ -1,0 +1,106 @@
+<div class="user-mgmt-container">
+  <h2>Gérer les utilisateurs Keycloak</h2>
+
+  <form (ngSubmit)="createUser(userForm)" #userForm="ngForm" class="user-form" autocomplete="off">
+    <input
+      type="text"
+      [(ngModel)]="newUser.username"
+      name="username"
+      placeholder="Nom d'utilisateur"
+      required
+      minlength="3"
+      maxlength="255"
+      autocomplete="off"
+      #usernameInput="ngModel"
+    >
+    <div *ngIf="usernameInput.invalid && usernameInput.touched" class="error">
+      Le nom d'utilisateur doit contenir entre 3 et 255 caractères.
+    </div>
+
+    <input
+      type="email"
+      [(ngModel)]="newUser.email"
+      name="email"
+      placeholder="Email"
+      required
+      email
+      pattern="^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$"
+      (input)="onEmailInput(newUser.email ?? '')"
+      #emailInput="ngModel"
+    >
+    <div *ngIf="emailInput.invalid && emailInput.touched" class="error">
+      Email invalide (ex: exemple&#64;exemple.com)
+    </div>
+    <div *ngIf="emailInput.valid && emailExists" class="error">
+      Cet email est déjà utilisé
+    </div>
+
+    <input
+      type="password"
+      [(ngModel)]="newUser.password"
+      name="password"
+      placeholder="Mot de passe"
+      required
+      autocomplete="new-password"
+      #passwordInput="ngModel"
+    >
+
+    <input
+      type="text"
+      [(ngModel)]="newUser.firstName"
+      name="firstName"
+      placeholder="Prénom"
+      required
+      autocomplete="off"
+      #firstNameInput="ngModel"
+    >
+    <input
+      type="text"
+      [(ngModel)]="newUser.lastName"
+      name="lastName"
+      placeholder="Nom"
+      required
+      autocomplete="off"
+      #lastNameInput="ngModel"
+    >
+    <select
+      [(ngModel)]="newUser.role"
+      name="role"
+      required
+      #roleInput="ngModel"
+    >
+      <option [ngValue]="undefined" disabled selected>Sélectionner un rôle</option>
+      <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+    </select>
+    <button type="submit" [disabled]="!userForm.form.valid || emailExists">Créer utilisateur</button>
+  </form>
+
+  <div *ngIf="message" class="message">{{ message }}</div>
+
+  <div *ngIf="loading">Chargement...</div>
+
+  <table *ngIf="users.length > 0" class="user-table">
+    <thead>
+      <tr>
+        <th>Nom d'utilisateur</th>
+        <th>Email</th>
+        <th>Prénom</th>
+        <th>Nom</th>
+        <th>Rôle</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.firstName }}</td>
+        <td>{{ user.lastName }}</td>
+        <td>{{ user.role }}</td>
+        <td>
+          <button type="button" (click)="deleteUser(user)">Supprimer</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

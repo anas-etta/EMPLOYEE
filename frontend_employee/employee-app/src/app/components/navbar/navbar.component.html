@@ -1,0 +1,20 @@
+<nav class="navbar">
+    <div class="nav-container">
+      <a class="logo" routerLink="/">Employee</a>
+      <div class="nav-links">
+        <a *ngFor="let item of navItems" 
+           routerLink="{{item.path}}" 
+           routerLinkActive="active"
+           [class.hidden]="item.requiredRole && !isAdmin"> 
+          {{item.label}}
+        </a>
+      </div>
+      <div class="user-section">
+        <span *ngIf="userProfile" class="username">
+          Bonjour, {{userProfile.username}}
+        </span>
+        <button *ngIf="!userProfile" (click)="login()">Connexion</button>
+        <button *ngIf="userProfile" (click)="logout()">Déconnexion</button>
+      </div>
+    </div>
+  </nav>

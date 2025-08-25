@@ -1,0 +1,68 @@
+<div class="container">
+  <div class="form-container">
+    <form [formGroup]="employeeForm" class="form-grid">
+      <div class="form-field">
+        <label for="firstNameInput">Prénom</label>
+        <input matInput id="firstNameInput" formControlName="firstName" placeholder="Prénom">
+      </div>
+
+      <div class="form-field">
+        <label for="lastNameInput">Nom</label>
+        <input matInput id="lastNameInput" formControlName="lastName" placeholder="Nom">
+      </div>
+
+      <div class="form-field">
+        <label for="emailInput">Email</label>
+        <input matInput id="emailInput" formControlName="email" placeholder="Email">
+        <span class="error-msg"
+              *ngIf="employeeForm.get('email')?.touched && employeeForm.get('email')?.errors?.['emailTaken']">
+          Cet email existe déjà
+        </span>
+      </div>
+
+      <div class="form-field">
+        <label for="immatriculationInput">Immatriculation</label>
+        <input matInput id="immatriculationInput" formControlName="immatriculation" placeholder="RH0000">
+        <span class="error-msg"
+              *ngIf="employeeForm.get('immatriculation')?.touched && employeeForm.get('immatriculation')?.errors?.['immatriculationTaken']">
+          Cette immatriculation existe déjà
+        </span>
+        <span class="error-msg"
+              *ngIf="employeeForm.get('immatriculation')?.touched && employeeForm.get('immatriculation')?.errors?.['pattern']">
+          Format invalide (doit être RH0000)
+        </span>
+      </div>
+
+      <div class="form-actions">
+        <button mat-button color="primary" (click)="saveEmployee()" [disabled]="employeeForm.invalid">
+          {{ isEditing ? 'Mettre à Jour' : 'Ajouter' }}
+        </button>
+        <button mat-button color="warn" *ngIf="isEditing" (click)="addNewEmployee()">Annuler</button>
+      </div>
+    </form>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <ng-container *ngFor="let column of columnDefinitions" [matColumnDef]="column.id">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ column.header }}
+      </th>
+      <td mat-cell *matCellDef="let employee">
+        <ng-container *ngIf="column.id !== 'actions'">
+          {{ employee[column.id] }}
+        </ng-container>
+        <ng-container *ngIf="column.id === 'actions'">
+          <button mat-button color="primary" (click)="editEmployee(employee)">Modifier</button>
+          <button mat-button color="warn" (click)="deleteEmployee(employee.id)">Supprimer</button>
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator [length]="totalElements" [pageSize]="10" [pageSizeOptions]="[5, 10, 25]"
+    (page)="onPaginateChange($event)">
+  </mat-paginator>
+</div>

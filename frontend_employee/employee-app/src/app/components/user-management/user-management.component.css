@@ -1,0 +1,33 @@
+.user-mgmt-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.user-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.user-form input,
+.user-form select {
+  flex: 1 1 160px;
+  padding: 0.4rem;
+}
+.user-form button {
+  padding: 0.4rem 1.2rem;
+}
+.message {
+  margin-bottom: 1rem;
+  color: #31708f;
+}
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.user-table th,
+.user-table td {
+  border: 1px solid #ccc;
+  padding: 0.4rem 0.7rem;
+  text-align: left;
+}
