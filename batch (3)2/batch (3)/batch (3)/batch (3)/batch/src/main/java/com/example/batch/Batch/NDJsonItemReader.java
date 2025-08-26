@@ -118,7 +118,7 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                     continue; // go to next file
                 }
 
-                nbrLigne++;
+                nbrLigne++; // Always increment ONCE per line
 
                 if (line.trim().isEmpty() || line.trim().equals("{}")) {
                     nbrLigneInvalide++;
@@ -137,9 +137,10 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                 try {
                     EmployeeDTO dto = objectMapper.readValue(line, EmployeeDTO.class);
 
+                    boolean hasError = false;
+
                     // First name empty check
                     if (dto.getFirstName() == null || dto.getFirstName().trim().isEmpty()) {
-                        nbrLigneInvalide++;
                         BatchErrorLogDTO errorLogDTO = new BatchErrorLogDTO(
                                 null,
                                 currentLineNumber,
@@ -148,13 +149,11 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                         );
                         errorLogService.logError(errorLogDTO);
                         System.err.println(errorLogDTO.getErrorMessage());
-                        currentLineNumber++;
-                        continue;
+                        hasError = true;
                     }
 
                     // Last name empty check
                     if (dto.getLastName() == null || dto.getLastName().trim().isEmpty()) {
-                        nbrLigneInvalide++;
                         BatchErrorLogDTO errorLogDTO = new BatchErrorLogDTO(
                                 null,
                                 currentLineNumber,
@@ -163,13 +162,11 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                         );
                         errorLogService.logError(errorLogDTO);
                         System.err.println(errorLogDTO.getErrorMessage());
-                        currentLineNumber++;
-                        continue;
+                        hasError = true;
                     }
 
                     // Email format validation
                     if (dto.getEmail() == null || !EMAIL_PATTERN.matcher(dto.getEmail()).matches()) {
-                        nbrLigneInvalide++;
                         BatchErrorLogDTO errorLogDTO = new BatchErrorLogDTO(
                                 null,
                                 currentLineNumber,
@@ -178,13 +175,11 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                         );
                         errorLogService.logError(errorLogDTO);
                         System.err.println(errorLogDTO.getErrorMessage());
-                        currentLineNumber++;
-                        continue;
+                        hasError = true;
                     }
 
                     // Immatriculation format validation
                     if (dto.getImmatriculation() == null || !IMMAT_PATTERN.matcher(dto.getImmatriculation()).matches()) {
-                        nbrLigneInvalide++;
                         BatchErrorLogDTO errorLogDTO = new BatchErrorLogDTO(
                                 null,
                                 currentLineNumber,
@@ -193,13 +188,11 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                         );
                         errorLogService.logError(errorLogDTO);
                         System.err.println(errorLogDTO.getErrorMessage());
-                        currentLineNumber++;
-                        continue;
+                        hasError = true;
                     }
 
                     // Email duplicate in file validation
-                    if (emailsInCurrentFile.contains(dto.getEmail())) {
-                        nbrLigneInvalide++;
+                    if (dto.getEmail() != null && emailsInCurrentFile.contains(dto.getEmail())) {
                         BatchErrorLogDTO errorLogDTO = new BatchErrorLogDTO(
                                 null,
                                 currentLineNumber,
@@ -208,13 +201,11 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                         );
                         errorLogService.logError(errorLogDTO);
                         System.err.println(errorLogDTO.getErrorMessage());
-                        currentLineNumber++;
-                        continue;
+                        hasError = true;
                     }
 
                     // Immatriculation duplicate in file validation
-                    if (immatriculationsInCurrentFile.contains(dto.getImmatriculation())) {
-                        nbrLigneInvalide++;
+                    if (dto.getImmatriculation() != null && immatriculationsInCurrentFile.contains(dto.getImmatriculation())) {
                         BatchErrorLogDTO errorLogDTO = new BatchErrorLogDTO(
                                 null,
                                 currentLineNumber,
@@ -223,13 +214,11 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                         );
                         errorLogService.logError(errorLogDTO);
                         System.err.println(errorLogDTO.getErrorMessage());
-                        currentLineNumber++;
-                        continue;
+                        hasError = true;
                     }
 
                     // Email uniqueness in database
-                    if (employeeRepository.existsByEmail(dto.getEmail())) {
-                        nbrLigneInvalide++;
+                    if (dto.getEmail() != null && employeeRepository.existsByEmail(dto.getEmail())) {
                         BatchErrorLogDTO errorLogDTO = new BatchErrorLogDTO(
                                 null,
                                 currentLineNumber,
@@ -238,13 +227,11 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                         );
                         errorLogService.logError(errorLogDTO);
                         System.err.println(errorLogDTO.getErrorMessage());
-                        currentLineNumber++;
-                        continue;
+                        hasError = true;
                     }
 
                     // Immatriculation uniqueness in database
-                    if (employeeRepository.existsByImmatriculation(dto.getImmatriculation())) {
-                        nbrLigneInvalide++;
+                    if (dto.getImmatriculation() != null && employeeRepository.existsByImmatriculation(dto.getImmatriculation())) {
                         BatchErrorLogDTO errorLogDTO = new BatchErrorLogDTO(
                                 null,
                                 currentLineNumber,
@@ -253,6 +240,11 @@ public class NDJsonItemReader implements ItemReader<EmployeeDTO> {
                         );
                         errorLogService.logError(errorLogDTO);
                         System.err.println(errorLogDTO.getErrorMessage());
+                        hasError = true;
+                    }
+
+                    if (hasError) {
+                        nbrLigneInvalide++; // Only once per line, no matter how many errors
                         currentLineNumber++;
                         continue;
                     }

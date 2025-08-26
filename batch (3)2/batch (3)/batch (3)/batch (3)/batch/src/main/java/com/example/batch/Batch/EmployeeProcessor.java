@@ -27,60 +27,91 @@ public class EmployeeProcessor implements ItemProcessor<EmployeeDTO, Employee> {
 
     @Override
     public Employee process(EmployeeDTO dto) {
-        String email = dto.getEmail();
-        String immat = dto.getImmatriculation();
+        boolean hasError = false;
 
+        // Validate firstName
+        if (dto.getFirstName() == null || dto.getFirstName().trim().isEmpty()) {
+            errorLogService.logError(
+                    "Le prénom est vide",
+                    "unknown",
+                    -1
+            );
+            hasError = true;
+        }
+
+        // Validate lastName
+        if (dto.getLastName() == null || dto.getLastName().trim().isEmpty()) {
+            errorLogService.logError(
+                    "Le nom est vide",
+                    "unknown",
+                    -1
+            );
+            hasError = true;
+        }
+
+        // Validate email
+        String email = dto.getEmail();
         if (email == null || !EMAIL_PATTERN.matcher(email).matches()) {
             errorLogService.logError(
                     "Format d'email invalide: " + email,
                     "unknown",
                     -1
             );
-            return null;
+            hasError = true;
         }
 
+        // Validate immatriculation
+        String immat = dto.getImmatriculation();
         if (immat == null || !IMMAT_PATTERN.matcher(immat).matches()) {
             errorLogService.logError(
                     "Format immatriculation invalide: " + immat,
                     "unknown",
                     -1
             );
-            return null;
+            hasError = true;
         }
 
-        // Check for duplicate in batch
-        if (emailsInBatch.contains(email)) {
-            errorLogService.logError(
-                    "Email en double dans le fichier: " + email,
-                    "unknown",
-                    -1
-            );
-            return null;
-        }
-        if (immatriculationsInBatch.contains(immat)) {
-            errorLogService.logError(
-                    "Immatriculation en double dans le fichier: " + immat,
-                    "unknown",
-                    -1
-            );
-            return null;
+        // Only check for duplicates if format is valid
+        if (!hasError) {
+            // Check for duplicate in batch
+            if (emailsInBatch.contains(email)) {
+                errorLogService.logError(
+                        "Email en double dans le fichier: " + email,
+                        "unknown",
+                        -1
+                );
+                hasError = true;
+            }
+            if (immatriculationsInBatch.contains(immat)) {
+                errorLogService.logError(
+                        "Immatriculation en double dans le fichier: " + immat,
+                        "unknown",
+                        -1
+                );
+                hasError = true;
+            }
+
+            // Check for duplicate in DB
+            if (employeeService.existsByEmail(email)) {
+                errorLogService.logError(
+                        "Email déjà utilisé en base: " + email,
+                        "unknown",
+                        -1
+                );
+                hasError = true;
+            }
+            if (employeeService.existsByImmatriculation(immat)) {
+                errorLogService.logError(
+                        "Immatriculation déjà utilisée en base: " + immat,
+                        "unknown",
+                        -1
+                );
+                hasError = true;
+            }
         }
 
-        // Check for duplicate in DB
-        if (employeeService.existsByEmail(email)) {
-            errorLogService.logError(
-                    "Email déjà utilisé en base: " + email,
-                    "unknown",
-                    -1
-            );
-            return null;
-        }
-        if (employeeService.existsByImmatriculation(immat)) {
-            errorLogService.logError(
-                    "Immatriculation déjà utilisée en base: " + immat,
-                    "unknown",
-                    -1
-            );
+        // If any error was found, reject the record
+        if (hasError) {
             return null;
         }
 
