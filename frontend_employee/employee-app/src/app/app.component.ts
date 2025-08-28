@@ -32,7 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
       console.log('Keycloak initialized');
       this.isLoading = false;
 
-      // Start periodic token refresh every 60 seconds
+     
       this.refreshSub = interval(60000).subscribe(() => {
         this.keycloakService.refreshToken().catch(err => {
           console.error('Token refresh failed:', err);

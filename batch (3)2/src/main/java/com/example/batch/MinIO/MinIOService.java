@@ -60,7 +60,7 @@ public class MinIOService {
             System.out.println("Fichier validé et uploadé: " + file.getName());
 
         } catch (Exception e) {
-            // Only log your custom message, do not include the Java exception message
+
             handleError("Erreur d'upload", file);
         }
     }
@@ -73,7 +73,7 @@ public class MinIOService {
         return file.getAbsolutePath().contains(errorDirectory);
     }
 
-    // Updated: Only your custom message, no exception message
+
     private void handleError(String errorType, File file) {
         String errorMsg = String.format("%s pour %s", errorType, file.getName());
         System.err.println("erreur:  " + errorMsg);

@@ -61,7 +61,7 @@ public class FileMoveListener extends JobExecutionListenerSupport {
                 Files.createDirectories(Path.of(PROCESSED_DIRECTORY));
                 Files.createDirectories(Path.of(ERROR_DIRECTORY));
 
-                // Use BatchTraitement table to decide if file had at least one valid line
+
                 Optional<BatchTraitement> traitementOpt = batchTraitementRepository
                         .findAll()
                         .stream()
@@ -88,7 +88,7 @@ public class FileMoveListener extends JobExecutionListenerSupport {
                 }
 
             } catch (Exception e) {
-                // Only log your custom message, do not include the Java exception message
+
                 System.err.println("Erreur d'upload pour " + file.getName());
                 e.printStackTrace();
                 errorLogService.logError("Erreur d'upload pour " + file.getName(), file.getName(), -1);

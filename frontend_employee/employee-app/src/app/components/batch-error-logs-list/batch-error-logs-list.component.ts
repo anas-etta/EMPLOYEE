@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatIconModule } from '@angular/material/icon'; // <-- ADD THIS LINE
+import { MatIconModule } from '@angular/material/icon'; 
 import { BatchErrorLogService, BatchErrorLog, PaginatedBatchErrorLogs } from '../../services/batch-error-logs.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
