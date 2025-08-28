@@ -14,8 +14,34 @@
   flex: 1 1 160px;
   padding: 0.4rem;
 }
-.user-form button {
+.user-form button,
+.btn-blue,
+.btn-red {
   padding: 0.4rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border 0.12s;
+}
+.btn-blue {
+  background: #2c3e50;
+  color: #fff;
+  border: 1.5px solid #2c3e50;
+}
+.btn-blue:hover:enabled {
+  background: #1252a2;
+  border-color: #1252a2;
+}
+.btn-red {
+  background: transparent;
+  color: #e53935;
+  border: 1.5px solid #e53935;
+}
+.btn-red:hover:enabled {
+  background: #e53935;
+  color: #fff;
 }
 .message {
   margin-bottom: 1rem;
@@ -30,4 +56,14 @@
   border: 1px solid #ccc;
   padding: 0.4rem 0.7rem;
   text-align: left;
+}
+.actions-cell {
+  display: flex;
+  gap: 0.4rem;
+}
+.error {
+  color: #e53935;
+  font-size: 0.97rem;
+  margin-bottom: 4px;
+  margin-top: 4px;
 }

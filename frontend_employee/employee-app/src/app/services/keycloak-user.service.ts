@@ -34,11 +34,14 @@ export class KeycloakUserService {
     return this.http.post<KeycloakUser>(this.baseUrl, user, { headers: this.getAuthHeaders() });
   }
 
+  updateUser(user: KeycloakUser): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${user.id}`, user, { headers: this.getAuthHeaders() });
+  }
+
   deleteUser(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`, { headers: this.getAuthHeaders() });
   }
 
-  // NEW: Check if email exists in Keycloak
   checkEmailExists(email: string): Observable<boolean> {
     return this.http.get<{ exists: boolean }>(
       `${this.baseUrl}/check-email`,

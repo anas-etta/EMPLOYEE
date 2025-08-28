@@ -56,7 +56,6 @@ public class KeycloakAdminServiceImpl implements KeycloakAdminService {
         HttpEntity<Void> req = new HttpEntity<>(headers);
         ResponseEntity<List> resp = restTemplate.exchange(url, HttpMethod.GET, req, List.class);
 
-        // Return only username, id, and roles
         List<Map<String, Object>> users = new ArrayList<>();
         for (Object userObj : resp.getBody()) {
             Map<String, Object> userMap = (Map<String, Object>) userObj;
@@ -67,7 +66,7 @@ public class KeycloakAdminServiceImpl implements KeycloakAdminService {
             userSummary.put("firstName", userMap.get("firstName"));
             userSummary.put("lastName", userMap.get("lastName"));
 
-            // Get user roles
+
             String userId = (String) userMap.get("id");
             String roleUrl = keycloakServerUrl + "/admin/realms/" + realm + "/users/" + userId + "/role-mappings/realm";
             ResponseEntity<List> roleResp = restTemplate.exchange(roleUrl, HttpMethod.GET, req, List.class);
@@ -87,7 +86,6 @@ public class KeycloakAdminServiceImpl implements KeycloakAdminService {
         String token = getAdminAccessToken();
         String url = keycloakServerUrl + "/admin/realms/" + realm + "/users";
 
-        // Build user payload
         Map<String, Object> user = new HashMap<>();
         user.put("username", userDTO.getUsername());
         user.put("enabled", true);
@@ -103,14 +101,14 @@ public class KeycloakAdminServiceImpl implements KeycloakAdminService {
         ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED) {
-            // Get user id
+
             String getUserUrl = UriComponentsBuilder.fromHttpUrl(url)
                     .queryParam("username", userDTO.getUsername()).toUriString();
             HttpEntity<Void> getUserRequest = new HttpEntity<>(headers);
             ResponseEntity<List> userResp = restTemplate.exchange(getUserUrl, HttpMethod.GET, getUserRequest, List.class);
             String userId = (String) ((Map) userResp.getBody().get(0)).get("id");
 
-            // Set password
+
             if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
                 String setPasswordUrl = keycloakServerUrl + "/admin/realms/" + realm + "/users/" + userId + "/reset-password";
                 Map<String, Object> passwordPayload = new HashMap<>();
@@ -122,17 +120,54 @@ public class KeycloakAdminServiceImpl implements KeycloakAdminService {
                 restTemplate.exchange(setPasswordUrl, HttpMethod.PUT, passwordRequest, Void.class);
             }
 
-            // Get role id
+
             String getRoleUrl = keycloakServerUrl + "/admin/realms/" + realm + "/roles/" + userDTO.getRole();
             ResponseEntity<Map> roleResp = restTemplate.exchange(getRoleUrl, HttpMethod.GET, getUserRequest, Map.class);
             Map role = roleResp.getBody();
 
-            // Assign role
+
             String assignRoleUrl = keycloakServerUrl + "/admin/realms/" + realm + "/users/" + userId + "/role-mappings/realm";
             HttpEntity<List<Map>> assignRequest = new HttpEntity<>(List.of(role), headers);
             restTemplate.exchange(assignRoleUrl, HttpMethod.POST, assignRequest, Void.class);
         } else {
             throw new RuntimeException("Erreur lors de la création de l'utilisateur");
+        }
+    }
+
+    @Override
+    public void updateUser(String id, KeycloakUserDTO userDTO) {
+        String token = getAdminAccessToken();
+        String url = keycloakServerUrl + "/admin/realms/" + realm + "/users/" + id;
+
+        Map<String, Object> user = new HashMap<>();
+        if (userDTO.getUsername() != null) user.put("username", userDTO.getUsername());
+        if (userDTO.getEmail() != null) user.put("email", userDTO.getEmail());
+        if (userDTO.getFirstName() != null) user.put("firstName", userDTO.getFirstName());
+        if (userDTO.getLastName() != null) user.put("lastName", userDTO.getLastName());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(user, headers);
+        restTemplate.exchange(url, HttpMethod.PUT, request, Void.class);
+
+
+        if (userDTO.getRole() != null) {
+
+            String roleMappingUrl = keycloakServerUrl + "/admin/realms/" + realm + "/users/" + id + "/role-mappings/realm";
+            ResponseEntity<List> getRolesResp = restTemplate.exchange(roleMappingUrl, HttpMethod.GET, new HttpEntity<>(headers), List.class);
+            List currentRoles = getRolesResp.getBody();
+            if (currentRoles != null && !currentRoles.isEmpty()) {
+                HttpEntity<List> removeRoleReq = new HttpEntity<>(currentRoles, headers);
+                restTemplate.exchange(roleMappingUrl, HttpMethod.DELETE, removeRoleReq, Void.class);
+            }
+            // Add the new role
+            String getRoleUrl = keycloakServerUrl + "/admin/realms/" + realm + "/roles/" + userDTO.getRole();
+            ResponseEntity<Map> getRoleResp = restTemplate.exchange(getRoleUrl, HttpMethod.GET, new HttpEntity<>(headers), Map.class);
+            Map role = getRoleResp.getBody();
+            HttpEntity<List<Map>> assignRequest = new HttpEntity<>(List.of(role), headers);
+            restTemplate.exchange(roleMappingUrl, HttpMethod.POST, assignRequest, Void.class);
         }
     }
 
@@ -145,6 +180,7 @@ public class KeycloakAdminServiceImpl implements KeycloakAdminService {
         HttpEntity<Void> request = new HttpEntity<>(headers);
         restTemplate.exchange(url, HttpMethod.DELETE, request, Void.class);
     }
+
     @Override
     public boolean emailExists(String email) {
         String token = getAdminAccessToken();

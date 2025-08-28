@@ -50,7 +50,7 @@ export class EmployeeCrudComponent implements OnInit {
         Validators.required,
         Validators.pattern('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
       ],
-      [] // set async validator dynamically
+      [] 
     ),
     immatriculation: new FormControl(
       '',
@@ -58,7 +58,7 @@ export class EmployeeCrudComponent implements OnInit {
         Validators.required,
         Validators.pattern('^RH\\d{4}$')
       ],
-      [] // set async validator dynamically
+      [] 
     )
   });
 
@@ -68,13 +68,12 @@ export class EmployeeCrudComponent implements OnInit {
   constructor(private employeeService: EmployeeService) {}
 
   ngOnInit(): void {
-    // Set async validators with DI service and current editing id
     this.setAllAsyncValidators();
     this.loadData(0, 10);
   }
 
   private setAllAsyncValidators(): void {
-    // Use a closure to capture the current editing id in validators
+   
     this.employeeForm.get('email')?.setAsyncValidators(this.emailAsyncValidator());
     this.employeeForm.get('immatriculation')?.setAsyncValidators(this.immatriculationAsyncValidator());
   }
@@ -120,9 +119,8 @@ export class EmployeeCrudComponent implements OnInit {
       email: employee.email,
       immatriculation: employee.immatriculation
     });
-    // Reset async validators to capture new editing id
+  
     this.setAllAsyncValidators();
-    // Reset state
     this.employeeForm.get('email')?.markAsPristine();
     this.employeeForm.get('email')?.markAsUntouched();
     this.employeeForm.get('immatriculation')?.markAsPristine();
@@ -159,7 +157,7 @@ export class EmployeeCrudComponent implements OnInit {
     this.loadData(0, this.paginator?.pageSize || 10);
   }
 
-  // --------- Email async validator (checks with backend) -----------
+  
   emailAsyncValidator(): AsyncValidatorFn {
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
       if (!control.value) {
@@ -172,7 +170,7 @@ export class EmployeeCrudComponent implements OnInit {
     };
   }
 
-  // --------- Immatriculation async validator (checks with backend) -----------
+  
   immatriculationAsyncValidator(): AsyncValidatorFn {
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
       if (!control.value) {

@@ -10,7 +10,7 @@ import { BatchTraitementsListComponent } from './components/batch-traitements-li
 export const routes: Routes = [
   { 
     path: '', 
-    redirectTo: '/employees', 
+    redirectTo: '/search', 
     pathMatch: 'full' 
   },
   { 

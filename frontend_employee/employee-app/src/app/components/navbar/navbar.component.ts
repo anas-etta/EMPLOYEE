@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class NavbarComponent implements OnInit {
   navItems = [
-    { path: '/employees', label: 'Liste des employés' },
+    
     { path: '/search', label: 'Rechercher un employé' },
     { 
       path: '/employees-crud', 
@@ -26,11 +26,7 @@ export class NavbarComponent implements OnInit {
       label: 'Utilisateurs',
       requiredRole: 'ROLE_ADMIN'
     },
-    {
-      path: '/batch-error-logs',
-      label: 'Batch Error Logs',
-      requiredRole: 'ROLE_ADMIN'
-    },
+    
     {
       path: '/batch-traitement',
       label: 'Batch traitement',

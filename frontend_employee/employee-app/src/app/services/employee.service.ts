@@ -37,24 +37,53 @@ export class EmployeeService {
 
   getEmployees(page: number, size: number): Observable<PaginatedEmployees> {
     const headers = this.getAuthHeaders();
-    return this.http.get<PaginatedEmployees>(`${this.baseUrl}?page=${page}&size=${size}`, { headers });
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', 'id,desc'); 
+    return this.http.get<PaginatedEmployees>(`${this.baseUrl}`, { params, headers });
   }
 
-  // New: Search by field
+  
+  searchEmployeesByMultipleFields(
+    firstName: string,
+    lastName: string,
+    email: string,
+    immatriculation: string,
+    page: number,
+    size: number
+  ): Observable<PaginatedEmployees> {
+    const headers = this.getAuthHeaders();
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', 'id,desc'); 
+    if (firstName) params = params.set('firstName', firstName);
+    if (lastName) params = params.set('lastName', lastName);
+    if (email) params = params.set('email', email);
+    if (immatriculation) params = params.set('immatriculation', immatriculation);
+    return this.http.get<PaginatedEmployees>(`${this.baseUrl}/search`, { params, headers });
+  }
+
   searchEmployeesByField(field: string, value: string, page: number, size: number): Observable<PaginatedEmployees> {
     const headers = this.getAuthHeaders();
     let params = new HttpParams()
       .set('field', field)
       .set('value', value)
       .set('page', page)
-      .set('size', size);
+      .set('size', size)
+      .set('sort', 'id,desc'); 
     return this.http.get<PaginatedEmployees>(`${this.baseUrl}/search-by-field`, { params, headers });
   }
 
-  // Old: Search generic (still here if you want to keep it)
   searchEmployees(query: string, page: number, size: number): Observable<PaginatedEmployees> {
     const headers = this.getAuthHeaders();
-    return this.http.get<PaginatedEmployees>(`${this.baseUrl}/search?query=${query}&page=${page}&size=${size}`, { headers });
+    let params = new HttpParams()
+      .set('query', query)
+      .set('page', page)
+      .set('size', size)
+      .set('sort', 'id,desc'); 
+    return this.http.get<PaginatedEmployees>(`${this.baseUrl}/search`, { params, headers });
   }
 
   deleteEmployee(id: number): Observable<void> {
@@ -72,19 +101,18 @@ export class EmployeeService {
     return this.http.put<Employee>(`${this.baseUrl}/${id}`, employee, { headers });
   }
 
-  // ---------- Email existence check (accepts optional id) ----------
   checkEmailExists(email: string, id?: number): Observable<boolean> {
     const headers = this.getAuthHeaders();
-    const params: any = { email };
-    if (id !== undefined) params.id = id;
+    let params = new HttpParams().set('email', email);
+    if (id !== undefined) params = params.set('id', id.toString());
     return this.http.get<boolean>(`${this.baseUrl}/check-email`, { params, headers });
   }
 
-  // ---------- Immatriculation existence check (accepts optional id) ----------
+  
   checkImmatriculationExists(immatriculation: string, id?: number): Observable<boolean> {
     const headers = this.getAuthHeaders();
-    const params: any = { immatriculation };
-    if (id !== undefined) params.id = id;
+    let params = new HttpParams().set('immatriculation', immatriculation);
+    if (id !== undefined) params = params.set('id', id.toString());
     return this.http.get<boolean>(`${this.baseUrl}/check-immatriculation`, { params, headers });
   }
 }

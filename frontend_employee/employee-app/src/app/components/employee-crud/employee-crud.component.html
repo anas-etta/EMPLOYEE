@@ -15,6 +15,10 @@
         <label for="emailInput">Email</label>
         <input matInput id="emailInput" formControlName="email" placeholder="Email">
         <span class="error-msg"
+              *ngIf="employeeForm.get('email')?.touched && (employeeForm.get('email')?.errors?.['pattern'] || employeeForm.get('email')?.errors?.['email'])">
+          Format invalide (ex: exemple&#64;exemple.com)
+        </span>
+        <span class="error-msg"
               *ngIf="employeeForm.get('email')?.touched && employeeForm.get('email')?.errors?.['emailTaken']">
           Cet email existe déjà
         </span>
@@ -33,7 +37,8 @@
         </span>
       </div>
 
-      <div class="form-actions">
+  
+      <div class="form-field form-action-inline">
         <button mat-button color="primary" (click)="saveEmployee()" [disabled]="employeeForm.invalid">
           {{ isEditing ? 'Mettre à Jour' : 'Ajouter' }}
         </button>

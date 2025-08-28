@@ -25,6 +25,18 @@
 
 </table>
 
+<div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+  <button
+    type="button"
+    class="btn-blue"
+    (click)="retour()"
+    style="display: flex; align-items: center; gap: 8px;"
+  >
+    <mat-icon style="vertical-align: middle;">arrow_back</mat-icon>
+    Retour à Batch traitement
+  </button>
+</div>
+
 <mat-paginator
   *ngIf="!filterFileName"
   [length]="totalElements"

@@ -32,7 +32,12 @@ export class BatchTraitementsListComponent implements OnInit {
 
   loadBatchTraitements(page: number, size: number): void {
     this.batchTraitementService.getBatchTraitements(page, size).subscribe((data: PaginatedBatchTraitements) => {
-      this.dataSource.data = data.content;
+      const sorted = [...data.content].sort((a, b) => {
+        const dateA = this.parseDate(a.startTime)?.getTime() || 0;
+        const dateB = this.parseDate(b.startTime)?.getTime() || 0;
+        return dateB - dateA;
+      });
+      this.dataSource.data = sorted;
       this.totalElements = data.totalElements;
       this.currentPage = data.number;
     });
@@ -42,10 +47,8 @@ export class BatchTraitementsListComponent implements OnInit {
     this.loadBatchTraitements(event.pageIndex, event.pageSize);
   }
 
-  // Parse date strings in "dd/MM/yyyy HH:mm:ss" format to JS Date objects
   parseDate(dateString: string): Date | null {
     if (!dateString) return null;
-    // Support both "dd/MM/yyyy" and "dd/MM/yyyy HH:mm:ss"
     const [datePart, timePart] = dateString.split(' ');
     const [day, month, year] = datePart.split('/').map(Number);
     let hours = 0, minutes = 0, seconds = 0;

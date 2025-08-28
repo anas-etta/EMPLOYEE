@@ -33,6 +33,13 @@ public class KeycloakUserController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody KeycloakUserDTO userDTO) {
+        keycloakAdminService.updateUser(id, userDTO);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
@@ -40,7 +47,7 @@ public class KeycloakUserController {
         return ResponseEntity.noContent().build();
     }
 
-    // --------- NEW: Check if email exists in Keycloak ---------
+
     @GetMapping("/check-email")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Boolean>> checkEmailExists(@RequestParam String email) {

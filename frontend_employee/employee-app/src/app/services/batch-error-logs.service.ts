@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { KeycloakService } from './keycloak.service';  // Import!
+import { KeycloakService } from './keycloak.service';  
 
 export interface BatchErrorLog {
   id: number;
@@ -13,7 +13,7 @@ export interface BatchErrorLog {
 export interface PaginatedBatchErrorLogs {
   content: BatchErrorLog[];
   totalElements: number;
-  number: number; // current page (0-based)
+  number: number; 
 }
 
 @Injectable({
@@ -24,7 +24,7 @@ export class BatchErrorLogService {
 
   constructor(
     private http: HttpClient,
-    private keycloakService: KeycloakService   // Inject!
+    private keycloakService: KeycloakService   
   ) {}
 
   private getAuthHeaders(): HttpHeaders {
@@ -42,7 +42,7 @@ export class BatchErrorLogService {
 
   getBatchErrorLogsByFileName(fileName: string): Observable<BatchErrorLog[]> {
     const headers = this.getAuthHeaders();
-    // Ensure backend supports this endpoint
+    
     return this.http.get<BatchErrorLog[]>(
       `${this.baseUrl}/by-filename/${encodeURIComponent(fileName)}`,
       { headers }

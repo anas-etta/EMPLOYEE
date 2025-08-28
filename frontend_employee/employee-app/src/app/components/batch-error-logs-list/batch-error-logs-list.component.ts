@@ -2,18 +2,25 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatIconModule } from '@angular/material/icon'; // <-- ADD THIS LINE
 import { BatchErrorLogService, BatchErrorLog, PaginatedBatchErrorLogs } from '../../services/batch-error-logs.service';
 import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-batch-error-logs-list',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatPaginatorModule],
+  imports: [
+    CommonModule, 
+    MatTableModule, 
+    MatPaginatorModule, 
+    MatIconModule 
+  ],
   templateUrl: './batch-error-logs-list.component.html',
   styleUrls: ['./batch-error-logs-list.component.css']
 })
 export class BatchErrorLogListComponent implements OnInit {
+ 
   displayedColumns: string[] = ['id', 'fileName', 'ligne', 'errorMessage'];
   dataSource = new MatTableDataSource<BatchErrorLog>([]);
   totalElements = 0;
@@ -25,11 +32,12 @@ export class BatchErrorLogListComponent implements OnInit {
 
   constructor(
     private batchErrorLogService: BatchErrorLogService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    // Check for fileName in query params to filter
+    
     this.route.queryParams.subscribe(params => {
       this.filterFileName = params['fileName'] || null;
       if (this.filterFileName) {
@@ -61,5 +69,9 @@ export class BatchErrorLogListComponent implements OnInit {
     } else {
       this.loadBatchErrorLogs(event.pageIndex, event.pageSize);
     }
+  }
+
+  retour(): void {
+    this.router.navigate(['/batch-traitement']);
   }
 }

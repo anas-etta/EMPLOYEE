@@ -5,6 +5,7 @@ import com.example.backend_Employee.Service.EmployeeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,20 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    // 🔹 Ajouter un nouvel employé (ADMIN uniquement)
+
+    private Sort getSortOrder(String sort) {
+        if (sort == null || sort.isEmpty()) {
+            return Sort.by(Sort.Direction.DESC, "id");
+        }
+        String[] parts = sort.split(",");
+        if (parts.length == 2) {
+            return Sort.by(Sort.Direction.fromString(parts[1]), parts[0]);
+        } else {
+            return Sort.by(Sort.Direction.ASC, parts[0]);
+        }
+    }
+
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody EmployeeDTO employeeDTO) {
@@ -30,19 +44,20 @@ public class EmployeeController {
         return ResponseEntity.ok(savedEmployee);
     }
 
-    // 🔹 Récupérer tous les employés (ADMIN et USER)
+
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<Page<EmployeeDTO>> getAllEmployees(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,desc") String sort
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, getSortOrder(sort));
         Page<EmployeeDTO> employees = employeeService.getAllEmployees(pageable);
         return ResponseEntity.ok(employees);
     }
 
-    // 🔹 Récupérer un employé par son ID (ADMIN et USER)
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
@@ -51,7 +66,7 @@ public class EmployeeController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // 🔹 Mettre à jour un employé (ADMIN uniquement)
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
@@ -63,7 +78,7 @@ public class EmployeeController {
         }
     }
 
-    // 🔹 Supprimer un employé (ADMIN uniquement)
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
@@ -71,34 +86,24 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
 
-    // 🔹 Rechercher des employés par prénom, nom ou email avec pagination (ADMIN et USER)
+
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<Page<EmployeeDTO>> searchEmployees(
-            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String immatriculation,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<EmployeeDTO> employees = employeeService.searchEmployees(query, pageable);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,desc") String sort
+    ) {
+        Pageable pageable = PageRequest.of(page, size, getSortOrder(sort));
+        Page<EmployeeDTO> employees = employeeService.searchEmployees(firstName, lastName, email, immatriculation, pageable);
         return ResponseEntity.ok(employees);
     }
 
-    // 🔹 Nouveau : Recherche par champ spécifique (ADMIN et USER)
-    @GetMapping("/search-by-field")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<Page<EmployeeDTO>> searchEmployeesByField(
-            @RequestParam String field,
-            @RequestParam String value,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<EmployeeDTO> employees = employeeService.searchEmployeesByField(field, value, pageable);
-        return ResponseEntity.ok(employees);
-    }
-
-    // 🔹 Vérifier si un email existe déjà (ADMIN et USER)
     @GetMapping("/check-email")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<Boolean> checkEmailExists(@RequestParam String email, @RequestParam(required = false) Long id) {
@@ -111,7 +116,7 @@ public class EmployeeController {
         return ResponseEntity.ok(exists);
     }
 
-    // 🔹 Vérifier si une immatriculation existe déjà (ADMIN et USER)
+
     @GetMapping("/check-immatriculation")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<Boolean> checkImmatriculationExists(@RequestParam String immatriculation, @RequestParam(required = false) Long id) {

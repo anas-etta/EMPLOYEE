@@ -7,7 +7,7 @@ import java.util.Map;
 public interface KeycloakAdminService {
     List<Map<String, Object>> getUsers();
     void createUser(KeycloakUserDTO userDTO);
+    void updateUser(String id, KeycloakUserDTO userDTO);
     void deleteUser(String id);
-
-    boolean emailExists(String email); // <--- Add this
+    boolean emailExists(String email);
 }

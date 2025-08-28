@@ -1,3 +1,21 @@
 table {
   width: 100%;
 }
+.btn-blue {
+  background: #2c3e50;
+  color: #fff;
+  border: 1.5px solid #2c3e50;
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border 0.12s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+}
+.btn-blue:hover:enabled,
+.btn-blue:hover {
+  background: #1252a2;
+  border-color: #1252a2;
+}

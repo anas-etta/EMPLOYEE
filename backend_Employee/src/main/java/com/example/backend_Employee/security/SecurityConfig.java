@@ -54,48 +54,48 @@ public class SecurityConfig {
         JwtGrantedAuthoritiesConverter defaultConverter = new JwtGrantedAuthoritiesConverter();
         Collection<GrantedAuthority> authorities = defaultConverter.convert(jwt);
 
-        // Ensure authorities is never null (Prevents potential NPE)
+
         if (authorities == null) {
             authorities = new ArrayList<>();
         }
 
-        // Safely handle the "realm_access" claim to prevent NullPointerException
+
         List<String> roles = jwt.getClaimAsMap("realm_access") != null
                 ? (List<String>) jwt.getClaimAsMap("realm_access").get("roles")
-                : List.of(); // Return an empty list if the roles claim is null
+                : List.of();
 
-        // Convert roles to SimpleGrantedAuthorities
+
         List<SimpleGrantedAuthority> roleAuthorities = roles.stream()
                 .map(role -> {
                     if (role.startsWith("ROLE_")) {
-                        return new SimpleGrantedAuthority(role); // Avoid double "ROLE_"
+                        return new SimpleGrantedAuthority(role);
                     } else {
                         return new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
                     }
                 })
                 .collect(Collectors.toList());
 
-        // Safely add roles to authorities (if any)
+
         authorities.addAll(roleAuthorities);
 
         return authorities;
     }
 
-    // Nouvelle manière de gérer CORS en Spring Security 6.x
+
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:4200"); // Autorise uniquement ton frontend
+        config.addAllowedOrigin("http://localhost:4200");
         config.addAllowedHeader("*");
-        config.addAllowedMethod("*"); // Autorise toutes les méthodes HTTP
+        config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
         return source;
     }
 
     @Bean
     public CorsConfigurationSource corsSource() {
-        return corsConfigurationSource();  // On applique la configuration CORS ici
+        return corsConfigurationSource();
     }
 }

@@ -40,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
-        // Uniqueness check for immatriculation and email (excluding current employee)
+
         if (employeeRepository.existsByImmatriculationAndIdNot(employeeDTO.getImmatriculation(), id)) {
             throw new RuntimeException("Immatriculation déjà utilisée");
         }
@@ -64,10 +64,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Page<EmployeeDTO> searchEmployees(String query, Pageable pageable) {
-        return employeeRepository
-                .findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
-                        query, query, query, pageable)
+    public Page<EmployeeDTO> searchEmployees(String firstName, String lastName, String email, String immatriculation, Pageable pageable) {
+
+        if ((firstName == null || firstName.isEmpty()) &&
+                (lastName == null || lastName.isEmpty()) &&
+                (email == null || email.isEmpty()) &&
+                (immatriculation == null || immatriculation.isEmpty())) {
+            return employeeRepository.findAll(pageable).map(employeeMapper::toDTO);
+        }
+        return employeeRepository.searchByMultipleFields(firstName, lastName, email, immatriculation, pageable)
                 .map(employeeMapper::toDTO);
     }
 
@@ -89,22 +94,5 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public boolean immatriculationExistsForUpdate(String immatriculation, Long id) {
         return employeeRepository.existsByImmatriculationAndIdNot(immatriculation, id);
-    }
-
-    // New method for field-specific search
-    @Override
-    public Page<EmployeeDTO> searchEmployeesByField(String field, String value, Pageable pageable) {
-        switch (field) {
-            case "firstName":
-                return employeeRepository.findByFirstNameContainingIgnoreCase(value, pageable).map(employeeMapper::toDTO);
-            case "lastName":
-                return employeeRepository.findByLastNameContainingIgnoreCase(value, pageable).map(employeeMapper::toDTO);
-            case "email":
-                return employeeRepository.findByEmailContainingIgnoreCase(value, pageable).map(employeeMapper::toDTO);
-            case "immatriculation":
-                return employeeRepository.findByImmatriculationContainingIgnoreCase(value, pageable).map(employeeMapper::toDTO);
-            default:
-                return Page.empty(pageable);
-        }
     }
 }

@@ -1,14 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
 import { EmployeeService, Employee, PaginatedEmployees } from '../../services/employee.service';
-import { PageEvent } from '@angular/material/paginator'; 
 
 @Component({
   selector: 'app-employee-search',
@@ -24,8 +23,13 @@ export class EmployeeSearchComponent implements OnInit {
   displayedColumns: string[] = ['id', 'firstName', 'lastName', 'email', 'immatriculation'];
   dataSource = new MatTableDataSource<Employee>([]);
   totalElements = 0;
-  query = '';
-  selectedField = 'firstName'; // Default field to search
+
+  search = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    immatriculation: ''
+  };
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -36,9 +40,16 @@ export class EmployeeSearchComponent implements OnInit {
     this.loadData(0, 10);
   }
 
-  loadData(page: number, size: number, field?: string, value?: string): void {
-    if (field && value) {
-      this.employeeService.searchEmployeesByField(field, value, page, size).subscribe((data: PaginatedEmployees) => {
+  loadData(page: number, size: number): void {
+    if (this.search.firstName || this.search.lastName || this.search.email || this.search.immatriculation) {
+      this.employeeService.searchEmployeesByMultipleFields(
+        this.search.firstName,
+        this.search.lastName,
+        this.search.email,
+        this.search.immatriculation,
+        page,
+        size
+      ).subscribe((data: PaginatedEmployees) => {
         this.dataSource.data = data.content;
         this.totalElements = data.totalElements;
         this.paginator.length = data.totalElements;
@@ -54,10 +65,10 @@ export class EmployeeSearchComponent implements OnInit {
 
   searchEmployees(): void {
     this.paginator.firstPage();
-    this.loadData(0, this.paginator.pageSize || 10, this.selectedField, this.query);
+    this.loadData(0, this.paginator.pageSize || 10);
   }
 
-  onPaginateChange(event: PageEvent): void {  
-    this.loadData(event.pageIndex, event.pageSize, this.selectedField, this.query);
+  onPaginateChange(event: PageEvent): void {
+    this.loadData(event.pageIndex, event.pageSize);
   }
 }

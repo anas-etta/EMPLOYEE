@@ -10,8 +10,8 @@ export interface BatchTraitement {
   nbrLigne: number;
   nbrLigneValide: number;
   nbrLigneInvalide: number;
-  startTime: string; // or Date, depending on serialization
-  stopTime: string;  // or Date, depending on serialization
+  startTime: string; 
+  stopTime: string;  
 }
 
 export interface PaginatedBatchTraitements {
@@ -45,7 +45,7 @@ export class BatchTraitementService {
 
   getErrorLogsByFileName(fileName: string): Observable<BatchErrorLog[]> {
     const headers = this.getAuthHeaders();
-    // Ensure backend supports this endpoint
+    
     return this.http.get<BatchErrorLog[]>(
       `${this.errorLogsUrl}/by-filename/${encodeURIComponent(fileName)}`,
       { headers }

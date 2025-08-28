@@ -13,16 +13,14 @@ public interface EmployeeService {
     EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);
     void deleteEmployee(Long id);
 
-    Page<EmployeeDTO> searchEmployees(String query, Pageable pageable);
+
+    Page<EmployeeDTO> searchEmployees(String firstName, String lastName, String email, String immatriculation, Pageable pageable);
 
     boolean emailExists(String email);
 
     boolean immatriculationExists(String immatriculation);
 
-    // For update validation
+
     boolean emailExistsForUpdate(String email, Long id);
     boolean immatriculationExistsForUpdate(String immatriculation, Long id);
-
-    // New for field-specific search
-    Page<EmployeeDTO> searchEmployeesByField(String field, String value, Pageable pageable);
 }

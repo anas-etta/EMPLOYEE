@@ -15,7 +15,7 @@ public class BatchErrorLog {
 
     @Column(name = "ligne")
     @JsonProperty("ligne")
-    private Integer ligne; // Use Integer for nullable
+    private Integer ligne;
 
     @Column(name = "error_message", nullable = false)
     @JsonProperty("errorMessage")

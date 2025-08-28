@@ -72,12 +72,26 @@
       <option [ngValue]="undefined" disabled selected>Sélectionner un rôle</option>
       <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
     </select>
-    <button type="submit" [disabled]="!userForm.form.valid || emailExists">Créer utilisateur</button>
+    <button type="submit" class="btn-blue" [disabled]="!userForm.form.valid || emailExists">Créer utilisateur</button>
   </form>
 
   <div *ngIf="message" class="message">{{ message }}</div>
 
   <div *ngIf="loading">Chargement...</div>
+
+  
+  <form *ngIf="editingUser" (ngSubmit)="updateUser()" class="user-form edit-form" autocomplete="off">
+    <h3>Modifier l'utilisateur</h3>
+    <input type="text" [(ngModel)]="editingUser.username" name="editUsername" required minlength="3" maxlength="255" placeholder="Nom d'utilisateur">
+    <input type="email" [(ngModel)]="editingUser.email" name="editEmail" required placeholder="Email">
+    <input type="text" [(ngModel)]="editingUser.firstName" name="editFirstName" required placeholder="Prénom">
+    <input type="text" [(ngModel)]="editingUser.lastName" name="editLastName" required placeholder="Nom">
+    <select [(ngModel)]="editingUser.role" name="editRole" required>
+      <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+    </select>
+    <button type="submit" class="btn-blue">Enregistrer</button>
+    <button type="button" class="btn-red" (click)="cancelEdit()">Annuler</button>
+  </form>
 
   <table *ngIf="users.length > 0" class="user-table">
     <thead>
@@ -97,8 +111,9 @@
         <td>{{ user.firstName }}</td>
         <td>{{ user.lastName }}</td>
         <td>{{ user.role }}</td>
-        <td>
-          <button type="button" (click)="deleteUser(user)">Supprimer</button>
+        <td class="actions-cell">
+          <button type="button" class="btn-blue" (click)="editUser(user)">Modifier</button>
+          <button type="button" class="btn-red" (click)="deleteUser(user)">Supprimer</button>
         </td>
       </tr>
     </tbody>
